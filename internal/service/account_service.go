@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+
 	"mirea_finance_tracker/internal/model"
 	"mirea_finance_tracker/internal/repository"
 
@@ -17,8 +18,13 @@ func NewAccountService(accountRepo *repository.AccountRepository, currencyRepo *
 	return &AccountService{accountRepo, currencyRepo}
 }
 
+type UpdateAccountInput struct {
+	Name           *string
+	CurrencyCode   *string
+	InitialBalance *float64
+}
+
 func (s *AccountService) CreateAccount(userID, name, currencyCode string, initialBalance float64) (uuid.UUID, error) {
-	// Проверка валюты
 	exists, err := s.currencyRepo.Exists(currencyCode)
 	if err != nil || !exists {
 		return uuid.Nil, errors.New("invalid currency code")
@@ -42,4 +48,62 @@ func (s *AccountService) CreateAccount(userID, name, currencyCode string, initia
 
 func (s *AccountService) GetAccountsByUser(userID string) ([]model.Account, error) {
 	return s.accountRepo.GetByUserID(userID)
+}
+
+func (s *AccountService) GetAccountByID(userID, accountID string) (*model.Account, error) {
+	account, err := s.accountRepo.GetByID(accountID)
+	if err != nil {
+		return nil, err
+	}
+
+	if account.UserID.String() != userID {
+		return nil, errors.New("access denied")
+	}
+
+	return account, nil
+}
+
+func (s *AccountService) DeleteAccount(userID, accountID string) error {
+	account, err := s.accountRepo.GetByID(accountID)
+	if err != nil {
+		return err
+	}
+
+	if account.UserID.String() != userID {
+		return errors.New("access denied")
+	}
+
+	return s.accountRepo.Delete(accountID)
+}
+
+func (s *AccountService) UpdateAccount(userID, accountID string, input UpdateAccountInput) error {
+	account, err := s.accountRepo.GetByID(accountID)
+	if err != nil {
+		return err
+	}
+
+	if account.UserID.String() != userID {
+		return errors.New("access denied")
+	}
+
+	if input.CurrencyCode != nil {
+		ok, err := s.currencyRepo.Exists(*input.CurrencyCode)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return errors.New("invalid currency code")
+		}
+		account.CurrencyCode = *input.CurrencyCode
+	}
+
+	if input.Name != nil {
+		account.Name = *input.Name
+	}
+
+	if input.InitialBalance != nil {
+		account.InitialBalance = *input.InitialBalance
+	}
+
+	return s.accountRepo.Update(account)
 }

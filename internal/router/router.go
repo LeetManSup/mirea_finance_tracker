@@ -37,7 +37,10 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	auth.Use(middleware.JWTAuthMiddleware())
 	auth.GET("/me", userHandler.GetMe)
 	auth.GET("/accounts", accountHandler.GetAccounts)
+	auth.GET("/accounts/:id", accountHandler.GetAccount)
 	auth.POST("/accounts", accountHandler.CreateAccount)
+	auth.PATCH("/accounts/:id", accountHandler.UpdateAccount)
+	auth.DELETE("/accounts/:id", accountHandler.DeleteAccount)
 
 	return r
 }
