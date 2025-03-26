@@ -32,8 +32,24 @@ func main() {
 
 	log.Println("Подключение к БД успешно, миграция завершена")
 
+	seedCurrencies(db)
+
 	r := router.SetupRouter(db)
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("Ошибка запуска сервера: %v", err)
 	}
+}
+
+func seedCurrencies(db *gorm.DB) {
+	currencies := []model.Currency{
+		{Code: "RUB", Name: "Российский рубль"},
+		{Code: "USD", Name: "Доллар США"},
+		{Code: "EUR", Name: "Евро"},
+	}
+
+	for _, currency := range currencies {
+		db.FirstOrCreate(&currency, model.Currency{Code: currency.Code})
+	}
+
+	log.Println("Базовые валюты инициализированы")
 }
