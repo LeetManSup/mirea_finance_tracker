@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"mirea_finance_tracker/internal/config"
 	"mirea_finance_tracker/internal/model"
 	"mirea_finance_tracker/internal/repository"
 	"time"
@@ -11,7 +12,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var jwtKey = []byte("secret-key") // для dev-режима; вынесем позже в конфиг
+var jwtKey = []byte(config.Load().JWTSecret)
 
 type AuthService struct {
 	userRepo *repository.UserRepository
