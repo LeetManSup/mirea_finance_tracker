@@ -27,6 +27,16 @@ type LoginInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
+// Register регистрирует нового пользователя
+// @Summary Регистрация
+// @Description Создаёт нового пользователя и возвращает JWT
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param input body RegisterInput true "Регистрационные данные"
+// @Success 201 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Router /register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var input RegisterInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -43,6 +53,16 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"token": token})
 }
 
+// Login выполняет вход пользователя
+// @Summary Авторизация
+// @Description Проверяет логин/пароль и возвращает JWT
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param input body LoginInput true "Данные для входа"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Router /login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var input LoginInput
 	if err := c.ShouldBindJSON(&input); err != nil {

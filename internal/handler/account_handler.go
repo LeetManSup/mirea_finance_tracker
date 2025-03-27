@@ -28,6 +28,16 @@ type updateAccountRequest struct {
 	InitialBalance *float64 `json:"initial_balance"`
 }
 
+// CreateAccount создаёт новый финансовый счёт
+// @Summary Создание счёта
+// @Tags accounts
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param input body CreateAccountInput true "Данные счёта"
+// @Success 201 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Router /accounts [post]
 func (h *AccountHandler) CreateAccount(c *gin.Context) {
 	var input CreateAccountInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -50,6 +60,14 @@ func (h *AccountHandler) CreateAccount(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"account_id": accountID})
 }
 
+// GetAccounts возвращает список счетов пользователя
+// @Summary Получить все счета
+// @Tags accounts
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {array} map[string]interface{}
+// @Failure 401 {object} map[string]string
+// @Router /accounts [get]
 func (h *AccountHandler) GetAccounts(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -77,6 +95,16 @@ func (h *AccountHandler) GetAccounts(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetAccount возвращает счёт по ID
+// @Summary Получить счёт по ID
+// @Tags accounts
+// @Security BearerAuth
+// @Produce json
+// @Param id path string true "Account ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 403 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /accounts/{id} [get]
 func (h *AccountHandler) GetAccount(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -100,6 +128,14 @@ func (h *AccountHandler) GetAccount(c *gin.Context) {
 	})
 }
 
+// DeleteAccount удаляет счёт
+// @Summary Удалить счёт
+// @Tags accounts
+// @Security BearerAuth
+// @Param id path string true "Account ID"
+// @Success 204
+// @Failure 403 {object} map[string]string
+// @Router /accounts/{id} [delete]
 func (h *AccountHandler) DeleteAccount(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -117,6 +153,17 @@ func (h *AccountHandler) DeleteAccount(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+// UpdateAccount обновляет данные счёта
+// @Summary Обновить счёт
+// @Tags accounts
+// @Security BearerAuth
+// @Accept json
+// @Param id path string true "Account ID"
+// @Param input body updateAccountRequest true "Поля для обновления"
+// @Success 204
+// @Failure 400 {object} map[string]string
+// @Failure 403 {object} map[string]string
+// @Router /accounts/{id} [patch]
 func (h *AccountHandler) UpdateAccount(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {

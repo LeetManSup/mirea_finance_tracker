@@ -1,7 +1,11 @@
 package router
 
 import (
+	_ "mirea_finance_tracker/docs"
+
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 
 	"mirea_finance_tracker/internal/handler"
@@ -31,6 +35,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	// Публичные маршруты
 	r.POST("/register", authHandler.Register)
 	r.POST("/login", authHandler.Login)
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Приватные маршруты с JWT middleware
 	auth := r.Group("/")

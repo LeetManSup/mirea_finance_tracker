@@ -1,3 +1,10 @@
+// @title Mirea Finance Tracker API
+// @version 1.0
+// @description API для отслеживания личных финансов
+// @host localhost:8080
+// @BasePath /
+// @schemes http
+
 package main
 
 import (

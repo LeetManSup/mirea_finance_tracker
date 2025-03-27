@@ -16,6 +16,14 @@ func NewUserHandler(userService *service.UserService) *UserHandler {
 	return &UserHandler{userService}
 }
 
+// GetMe возвращает данные текущего пользователя
+// @Summary Получить текущего пользователя
+// @Tags user
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Router /me [get]
 func (h *UserHandler) GetMe(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
