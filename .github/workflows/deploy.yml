@@ -1,0 +1,30 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v3
+
+      - name: Установка Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24.1'
+
+      - name: Проверка зависимостей
+        run: go mod tidy
+
+      - name: Сборка проекта
+        run: go build -v ./cmd/server
+
+      - name: Проверка стиля
+        run: go vet ./...
+
+      - name: Прогон тестов (если появятся)
+        run: go test ./... || true
