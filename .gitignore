@@ -26,3 +26,6 @@ go.work.sum
 
 # Swagger artifacts
 docs/swagger.yaml
+
+# Self-signed SSL
+deploy/nginx/ssl/self.*
