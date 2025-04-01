@@ -9,6 +9,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -23,13 +24,17 @@ func NewAuthService(userRepo *repository.UserRepository) *AuthService {
 }
 
 func (s *AuthService) Register(email, password, fullName string) (string, error) {
+	logrus.Infof("Попытка зарегистрировать пользователя: %s", email)
+
 	_, err := s.userRepo.FindByEmail(email)
 	if err == nil {
+		logrus.Errorf("Ошибка регистрации, пользователь с таким email уже существует: %v", email)
 		return "", errors.New("user already exists")
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
+		logrus.Errorf("Ошибка генерации пароля: %v", err)
 		return "", err
 	}
 
@@ -41,9 +46,11 @@ func (s *AuthService) Register(email, password, fullName string) (string, error)
 	}
 
 	if err := s.userRepo.Create(&user); err != nil {
+		logrus.Errorf("Ошибка создания пользователя: %v", err)
 		return "", err
 	}
 
+	logrus.Infof("Пользователь успешно создан: %s", user.Email)
 	return generateJWT(user.ID)
 }
 

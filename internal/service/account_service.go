@@ -7,6 +7,7 @@ import (
 	"mirea_finance_tracker/internal/repository"
 
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 type AccountService struct {
@@ -27,6 +28,7 @@ type UpdateAccountInput struct {
 func (s *AccountService) CreateAccount(userID, name, currencyCode string, initialBalance float64) (uuid.UUID, error) {
 	exists, err := s.currencyRepo.Exists(currencyCode)
 	if err != nil || !exists {
+		logrus.Errorf("Ошибка, неизвестная валюта: %v", err)
 		return uuid.Nil, errors.New("invalid currency code")
 	}
 
@@ -38,11 +40,15 @@ func (s *AccountService) CreateAccount(userID, name, currencyCode string, initia
 		InitialBalance: initialBalance,
 	}
 
+	logrus.Infof("Создание нового счёта: %s", account.Name)
+
 	err = s.accountRepo.Create(&account)
 	if err != nil {
+		logrus.Errorf("Ошибка при создании счёта: %v", err)
 		return uuid.Nil, err
 	}
 
+	logrus.Infof("Счёт успешно создан: %s", account.Name)
 	return account.ID, nil
 }
 

@@ -29,3 +29,6 @@ docs/swagger.yaml
 
 # Self-signed SSL
 deploy/nginx/ssl/self.*
+
+# Logs
+logs

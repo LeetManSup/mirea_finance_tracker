@@ -11,6 +11,8 @@ services:
       - "8080"
     env_file:
       - .env
+    volumes:
+      - ./logs:/app/logs
 
   app2:
     build:
@@ -24,6 +26,8 @@ services:
       - "8080"
     env_file:
       - .env
+    volumes:
+      - ./logs:/app/logs
 
   app3:
     build:
@@ -37,6 +41,8 @@ services:
       - "8080"
     env_file:
       - .env
+    volumes:
+      - ./logs:/app/logs
 
   db:
     image: postgres:17
@@ -59,6 +65,7 @@ services:
     volumes:
       - ./deploy/nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./deploy/nginx/ssl:/etc/nginx/ssl
+      - ./logs:/var/log/nginx
     depends_on:
       - app1
       - app2

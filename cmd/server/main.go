@@ -12,12 +12,22 @@ import (
 	"mirea_finance_tracker/internal/config"
 	"mirea_finance_tracker/internal/model"
 	"mirea_finance_tracker/internal/router"
+	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
+	logFile, err := os.OpenFile("/app/logs/api.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err == nil {
+		logrus.SetOutput(logFile)
+	} else {
+		logrus.Warn("Не удалось создать файл логов, используем stdout")
+	}
+
 	cfg := config.Load()
 
 	db, err := gorm.Open(postgres.Open(cfg.DSN()), &gorm.Config{})
