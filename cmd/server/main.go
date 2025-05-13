@@ -11,6 +11,7 @@ import (
 	"log"
 	"mirea_finance_tracker/internal/config"
 	"mirea_finance_tracker/internal/model"
+	"mirea_finance_tracker/internal/redis"
 	"mirea_finance_tracker/internal/router"
 	"os"
 
@@ -21,6 +22,7 @@ import (
 )
 
 func main() {
+	redis.InitRedis()
 	logFile, err := os.OpenFile("/app/logs/api.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err == nil {
 		logrus.SetOutput(logFile)

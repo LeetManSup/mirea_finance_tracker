@@ -1,8 +1,13 @@
 package handler
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
+	"mirea_finance_tracker/internal/model"
+	"mirea_finance_tracker/internal/redis"
 	"mirea_finance_tracker/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -113,11 +118,31 @@ func (h *AccountHandler) GetAccount(c *gin.Context) {
 	}
 
 	accountID := c.Param("id")
+	cacheKey := fmt.Sprintf("account:%s:user:%s", accountID, userID.(string))
+
+	val, err := redis.Client.Get(redis.Ctx, cacheKey).Result()
+	if err == nil {
+		var acc model.Account
+		if err := json.Unmarshal([]byte(val), &acc); err == nil {
+			c.JSON(http.StatusOK, gin.H{
+				"id":              acc.ID,
+				"name":            acc.Name,
+				"currency_code":   acc.CurrencyCode,
+				"initial_balance": acc.InitialBalance,
+				"created_at":      acc.CreatedAt,
+			})
+			return
+		}
+	}
+
 	account, err := h.accountService.GetAccountByID(userID.(string), accountID)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
+
+	data, _ := json.Marshal(account)
+	redis.Client.Set(redis.Ctx, cacheKey, data, 10*time.Minute)
 
 	c.JSON(http.StatusOK, gin.H{
 		"id":              account.ID,

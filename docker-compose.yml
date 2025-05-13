@@ -71,5 +71,13 @@ services:
       - app2
       - app3
 
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: always
+    ports:
+      - "6380:6379"
+
+
 volumes:
   postgres_data:
